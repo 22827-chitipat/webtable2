@@ -4,36 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบจัดการข้อมูลพนักงาน</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --success: #10b981;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --danger: #ef4444;
+            --danger-bg: #fee2e2;
+            --danger-text: #991b1b;
+            --bg-body: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
-            color: #333;
+            font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            padding: 20px;
+            padding: 40px 20px;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .table-card {
+        /* การ์ดตารางสไตล์มินิมอล โมเดิร์น */
+        .container {
             background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border-radius: 20px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 20px 25px -5px rgb(0 0 0 / 0.02);
             width: 100%;
-            max-width: 900px;
-            padding: 24px;
+            max-width: 950px;
+            padding: 32px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
         }
 
-        .table-header {
-            margin-bottom: 20px;
-        }
-
-        .table-header h2 {
-            margin: 0;
+        .header-title {
             font-size: 24px;
-            color: #1a1a1a;
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: 0;
+            margin-bottom: 28px;
+            letter-spacing: -0.5px;
+        }
+
+        /* โครงสร้างตาราง */
+        .table-responsive {
+            overflow-x: auto;
         }
 
         table {
@@ -43,205 +69,239 @@
         }
 
         th {
-            background-color: #f8fafc;
-            color: #64748b;
-            padding: 16px;
-            font-size: 14px;
+            color: var(--text-muted);
+            padding: 16px 20px;
+            font-size: 13px;
             font-weight: 600;
-            border-bottom: 2px solid #e2e8f0;
-            text-transform: uppercase;
+            border-bottom: 1px solid var(--border-color);
+            background-color: #f8fafc;
+            letter-spacing: 0.5px;
         }
+
+        th:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+        th:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
 
         td {
-            padding: 16px;
-            border-bottom: 1px solid #e2e8f0;
+            padding: 18px 20px;
+            border-bottom: 1px solid #f1f5f9;
             font-size: 15px;
+            font-weight: 500;
             color: #334155;
-            vertical-align: middle;
+            transition: all 0.2s ease;
         }
 
-        tr:hover {
-            background-color: #f8fafc;
+        tr:hover td {
+            background-color: #fafafa;
         }
 
+        /* ตกแต่ง Input โหมดแก้ไข */
         input[type="text"], select {
-            width: 90%;
-            padding: 8px 12px;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px 14px;
             border: 1px solid #cbd5e1;
-            border-radius: 6px;
+            border-radius: 10px;
             font-size: 14px;
-            outline: none;
             font-family: inherit;
+            color: var(--text-main);
+            background-color: #fff;
+            transition: all 0.2s;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
         }
 
         input[type="text"]:focus, select:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
         }
 
-        .status-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
+        /* สถานะ Badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 9999px;
             font-size: 13px;
-            font-weight: 500;
-            text-align: center;
+            font-weight: 600;
         }
 
-        .status-active {
-            background-color: #dcfce7;
-            color: #15803d;
+        .badge-active {
+            background-color: var(--success-bg);
+            color: var(--success-text);
         }
 
-        .status-inactive {
-            background-color: #fee2e2;
-            color: #b91c1c;
+        .badge-inactive {
+            background-color: var(--danger-bg);
+            color: var(--danger-text);
         }
 
+        /* ปุ่มกดที่สวยงามขึ้น */
         .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 18px;
+            border-radius: 10px;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             font-family: inherit;
+            border: 1px solid transparent;
         }
 
         .btn-edit {
-            background-color: #f1f5f9;
+            background-color: #ffffff;
             color: #475569;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
         .btn-edit:hover {
-            background-color: #e2e8f0;
+            background-color: #f8fafc;
+            color: #1e293b;
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
         }
 
         .btn-save {
-            background-color: #22c55e;
+            background-color: var(--primary);
             color: white;
-            display: none;
+            box-shadow: 0 1px 2px rgba(59, 130, 246, 0.2);
         }
 
         .btn-save:hover {
-            background-color: #16a34a;
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        /* ซ่อนอิลิเมนต์ที่ไม่ได้ใช้งาน */
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
 <body>
 
-<div class="table-card">
-    <div class="table-header">
-        <h2>รายชื่อพนักงานในระบบ</h2>
-    </div>
+<div class="container">
+    <h2 class="header-title">รายชื่อพนักงานในระบบ</h2>
     
-    <table>
-        <thead>
-            <tr>
-                <th>ชื่อ - นามสกุล</th>
-                <th>ตำแหน่ง</th>
-                <th>สถานะ</th>
-                <th style="width: 150px; text-align: center;">จัดการ</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr id="row-1">
-                <td>
-                    <span class="view-mode">สมชาย ใจดี</span>
-                    <input type="text" class="edit-mode" value="สมชาย ใจดี" style="display:none;">
-                </td>
-                <td>
-                    <span class="view-mode">Web Developer</span>
-                    <input type="text" class="edit-mode" value="Web Developer" style="display:none;">
-                </td>
-                <td>
-                    <span class="view-mode status-badge status-active">ใช้งานอยู่</span>
-                    <select class="edit-mode" style="display:none;">
-                        <option value="ใช้งานอยู่" selected>ใช้งานอยู่</option>
-                        <option value="ระงับใช้งาน">ระงับใช้งาน</option>
-                    </select>
-                </td>
-                <td style="text-align: center;">
-                    <button class="btn btn-edit" onclick="toggleEdit('row-1')">แก้ไข</button>
-                    <button class="btn btn-save" onclick="saveRow('row-1')">บันทึก</button>
-                </td>
-            </tr>
-            <tr id="row-2">
-                <td>
-                    <span class="view-mode">สมศรี มีสุข</span>
-                    <input type="text" class="edit-mode" value="สมศรี มีสุข" style="display:none;">
-                </td>
-                <td>
-                    <span class="view-mode">UX/UI Designer</span>
-                    <input type="text" class="edit-mode" value="UX/UI Designer" style="display:none;">
-                </td>
-                <td>
-                    <span class="view-mode status-badge status-active">ใช้งานอยู่</span>
-                    <select class="edit-mode" style="display:none;">
-                        <option value="ใช้งานอยู่" selected>ใช้งานอยู่</option>
-                        <option value="ระงับใช้งาน">ระงับใช้งาน</option>
-                    </select>
-                </td>
-                <td style="text-align: center;">
-                    <button class="btn btn-edit" onclick="toggleEdit('row-2')">แก้ไข</button>
-                    <button class="btn btn-save" onclick="saveRow('row-2')">บันทึก</button>
-                </td>
-            </tr>
-            <tr id="row-3">
-                <td>
-                    <span class="view-mode">สมศักดิ์ รักเรียน</span>
-                    <input type="text" class="edit-mode" value="สมศักดิ์ รักเรียน" style="display:none;">
-                </td>
-                <td>
-                    <span class="view-mode">Data Analyst</span>
-                    <input type="text" class="edit-mode" value="Data Analyst" style="display:none;">
-                </td>
-                <td>
-                    <span class="view-mode status-badge status-inactive">ระงับใช้งาน</span>
-                    <select class="edit-mode" style="display:none;">
-                        <option value="ใช้งานอยู่">ใช้งานอยู่</option>
-                        <option value="ระงับใช้งาน" selected>ระงับใช้งาน</option>
-                    </select>
-                </td>
-                <td style="text-align: center;">
-                    <button class="btn btn-edit" onclick="toggleEdit('row-3')">แก้ไข</button>
-                    <button class="btn btn-save" onclick="saveRow('row-3')">บันทึก</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>ชื่อ - นามสกุล</th>
+                    <th>ตำแหน่ง</th>
+                    <th>สถานะ</th>
+                    <th style="width: 140px; text-align: center;">จัดการ</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
-    function toggleEdit(rowId) {
-        const row = document.getElementById(rowId);
-        row.querySelectorAll('.view-mode').forEach(el => el.style.display = 'none');
-        row.querySelectorAll('.edit-mode').forEach(el => el.style.display = 'block');
-        row.querySelector('.btn-edit').style.display = 'none';
-        row.querySelector('.btn-save').style.display = 'inline-block';
+    // ข้อมูลเริ่มต้นในตาราง
+    let employees = [
+        { id: 1, name: 'สมชาย ใจดี', role: 'Web Developer', status: 'ใช้งานอยู่' },
+        { id: 2, name: 'สมศรี มีสุข', role: 'UX/UI Designer', status: 'ใช้งานอยู่' },
+        { id: 3, name: 'สมศักดิ์ รักเรียน', role: 'Data Analyst', status: 'ระงับใช้งาน' }
+    ];
+
+    // โหมดการแก้ไขของแต่ละแถว (เก็บค่า id ที่กำลังแก้ไขอยู่)
+    let editingId = null;
+
+    // ฟังก์ชันวาดตารางใหม่เมื่อมีการเปลี่ยนสถานะหรือข้อมูล
+    function renderTable() {
+        const tbody = document.getElementById('table-body');
+        tbody.innerHTML = '';
+
+        employees.forEach(emp => {
+            const tr = document.createElement('tr');
+            const isEditing = emp.id === editingId;
+
+            // สร้างคอลัมน์ ชื่อ-นามสกุล
+            const nameTd = document.createElement('td');
+            if (isEditing) {
+                nameTd.innerHTML = `<input type="text" id="edit-name-${emp.id}" value="${emp.name}">`;
+            } else {
+                nameTd.textContent = emp.name;
+            }
+
+            // สร้างคอลัมน์ ตำแหน่ง
+            const roleTd = document.createElement('td');
+            if (isEditing) {
+                roleTd.innerHTML = `<input type="text" id="edit-role-${emp.id}" value="${emp.role}">`;
+            } else {
+                roleTd.textContent = emp.role;
+            }
+
+            // สร้างคอลัมน์ สถานะ
+            const statusTd = document.createElement('td');
+            if (isEditing) {
+                statusTd.innerHTML = `
+                    <select id="edit-status-${emp.id}">
+                        <option value="ใช้งานอยู่" ${emp.status === 'ใช้งานอยู่' ? 'selected' : ''}>ใช้งานอยู่</option>
+                        <option value="ระงับใช้งาน" ${emp.status === 'ระงับใช้งาน' ? 'selected' : ''}>ระงับใช้งาน</option>
+                    </select>
+                `;
+            } else {
+                const badgeClass = emp.status === 'ใช้งานอยู่' ? 'badge badge-active' : 'badge badge-inactive';
+                statusTd.innerHTML = `<span class="${badgeClass}">${emp.status}</span>`;
+            }
+
+            // สร้างคอลัมน์ ปุ่มกดจัดการ
+            const actionTd = document.createElement('td');
+            actionTd.style.textAlign = 'center';
+            if (isEditing) {
+                actionTd.innerHTML = `<button class="btn btn-save" onclick="saveRow(${emp.id})">บันทึก</button>`;
+            } else {
+                actionTd.innerHTML = `<button class="btn btn-edit" onclick="enterEditMode(${emp.id})">แก้ไข</button>`;
+            }
+
+            tr.appendChild(nameTd);
+            tr.appendChild(roleTd);
+            tr.appendChild(statusTd);
+            tr.appendChild(actionTd);
+            tbody.appendChild(tr);
+        });
     }
 
-    function saveRow(rowId) {
-        const row = document.getElementById(rowId);
-        const inputs = row.querySelectorAll('input, select');
-        const spans = row.querySelectorAll('.view-mode');
+    // ฟังก์ชันเข้าสู่โหมดแก้ไข
+    function enterEditMode(id) {
+        editingId = id;
+        renderTable();
+    }
 
-        spans[0].textContent = inputs[0].value;
-        spans[1].textContent = inputs[1].value;
-        spans[2].textContent = inputs[2].value;
+    // ฟังก์ชันบันทึกข้อมูลจริงลง Array และปิดโหมดแก้ไข
+    function saveRow(id) {
+        const newName = document.getElementById(`edit-name-${id}`).value.trim();
+        const newRole = document.getElementById(`edit-role-${id}`).value.trim();
+        const newStatus = document.getElementById(`edit-status-${id}`).value;
 
-        if (inputs[2].value === 'ใช้งานอยู่') {
-            spans[2].className = 'view-mode status-badge status-active';
-        } else {
-            spans[2].className = 'view-mode status-badge status-inactive';
+        // ดักกรณีผู้ใช้เว้นว่างข้อมูล
+        if (!newName || !newRole) {
+            alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+            return;
         }
 
-        row.querySelectorAll('.view-mode').forEach(el => el.style.display = 'inline-block');
-        row.querySelectorAll('.edit-mode').forEach(el => el.style.display = 'none');
-        row.querySelector('.btn-edit').style.display = 'inline-block';
-        row.querySelector('.btn-save').style.display = 'none';
+        // อัปเดตข้อมูลพนักงานใน Array ตัวแปร
+        const empIndex = employees.findIndex(e => e.id === id);
+        if (empIndex !== -1) {
+            employees[empIndex].name = newName;
+            employees[empIndex].role = newRole;
+            employees[empIndex].status = newStatus;
+        }
+
+        // ออกจากโหมดแก้ไขและอัปเดตหน้าตาตาราง
+        editingId = null;
+        renderTable();
     }
+
+    // เริ่มต้นให้แสดงตารางตอนโหลดหน้าเว็บครั้งแรก
+    renderTable();
 </script>
 
 </body>
